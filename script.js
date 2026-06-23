@@ -1,254 +1,413 @@
-const introScene = document.getElementById("introScene");
-const storyScene = document.getElementById("storyScene");
-const finalScene = document.getElementById("finalScene");
-
-const heart = document.getElementById("heart");
-const tapText = document.getElementById("tapText");
-const birthdayTitle = document.getElementById("birthdayTitle");
-
-const cards = document.querySelectorAll(".storyCard");
-const continueHint = document.getElementById("continueHint");
-
-const typedLetter = document.getElementById("typedLetter");
-const replayBtn = document.getElementById("replayBtn");
-
-let petalsStarted = false;
-let currentScene = 0;
-let storyActive = false;
-
-/* ==========================
-   PETALS
-========================== */
-
-function createPetal() {
-
-    const petal = document.createElement("img");
-
-    petal.src = "assets/petal.png";
-
-    petal.classList.add("petal");
-
-    const size = Math.random() * 18 + 10;
-
-    petal.style.width = size + "px";
-
-    petal.style.left =
-        Math.random() * window.innerWidth + "px";
-
-    petal.style.animationDuration =
-        Math.random() * 6 + 8 + "s";
-
-    document.body.appendChild(petal);
-
-    setTimeout(() => {
-        petal.remove();
-    }, 15000);
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-function startPetals() {
+body {
 
-    if (petalsStarted) return;
+    width: 100vw;
+    height: 100vh;
 
-    petalsStarted = true;
+    overflow: hidden;
 
-    setInterval(() => {
-        createPetal();
-    }, 200);
+    font-family: 'Poppins', sans-serif;
+
+    background:
+        radial-gradient(circle at center,
+            #ff5ca8 0%,
+            #5a003d 45%,
+            #120010 100%);
+
+    transition: background 1s ease;
 }
 
-/* ==========================
-   START STORY
-========================== */
+/* PETALS */
 
-function startExperience() {
+#petalContainer {
 
-    document.body.removeEventListener(
-        "click",
-        startExperience
-    );
+    position: fixed;
 
-    gsap.to("#heart", {
-        scale: 12,
-        opacity: 0,
-        duration: 1
-    });
+    inset: 0;
 
-    gsap.to("#tapText", {
-        opacity: 0,
-        duration: 0.3
-    });
+    pointer-events: none;
 
-    gsap.to("#birthdayTitle", {
-        opacity: 1,
-        y: -30,
-        duration: 1.5,
-        delay: 0.5
-    });
-
-    startPetals();
-
-    setTimeout(() => {
-
-        gsap.to("#birthdayTitle", {
-            opacity: 0,
-            duration: 1
-        });
-
-        setTimeout(() => {
-
-            introScene.style.display = "none";
-
-            storyScene.style.display = "flex";
-
-            showScene(0);
-
-            storyActive = true;
-
-        }, 1000);
-
-    }, 3000);
+    z-index: 1;
 }
 
-/* ==========================
-   STORY SCENES
-========================== */
+.petal {
 
-function showScene(index) {
+    position: fixed;
 
-    cards.forEach(card => {
+    top: -100px;
 
-        card.style.opacity = "0";
-        card.style.transform =
-            "translateY(40px)";
+    pointer-events: none;
 
-        card.classList.remove("active");
-    });
+    opacity: .9;
 
-    cards[index].classList.add("active");
-
-    gsap.to(cards[index], {
-        opacity: 1,
-        y: 0,
-        duration: 1.2,
-        ease: "power3.out"
-    });
-
-    const colors = [
-
-        "radial-gradient(circle at center,#ff5ca8 0%,#5a003d 45%,#120010 100%)",
-
-        "radial-gradient(circle at center,#ff82c4 0%,#6a1b52 45%,#140012 100%)",
-
-        "radial-gradient(circle at center,#ff9ad6 0%,#7b245e 45%,#190015 100%)"
-    ];
-
-    document.body.style.background =
-        colors[index];
+    animation: fall linear forwards;
 }
 
-function nextScene() {
+@keyframes fall {
 
-    if (!storyActive) return;
+    0% {
 
-    currentScene++;
+        transform:
+            translateY(-100px) rotate(0deg);
 
-    if (currentScene < cards.length) {
+    }
 
-        showScene(currentScene);
+    100% {
 
-    } else {
+        transform:
+            translateY(120vh) translateX(120px) rotate(360deg);
 
-        openLetter();
     }
 }
 
-/* ==========================
-   FINAL LETTER
-========================== */
+/* INTRO */
 
-const finalText = `No matter how much time passes,
+#introScene {
 
-some people remain special in ways
-that are difficult to explain.
+    position: absolute;
 
-Today isn't about the past.
-It's about celebrating you,
-the person you are,
-and all the wonderful things waiting ahead.
+    inset: 0;
 
-I hope your day is filled with laughter,
-your year with success,
-and your life with happiness.
+    display: flex;
 
-Happy Birthday, Palvi. ❤️
+    flex-direction: column;
 
-— Manish`;
+    justify-content: center;
 
-function typeLetter(text, element) {
+    align-items: center;
 
-    let i = 0;
-
-    element.innerHTML = "";
-
-    const typing = setInterval(() => {
-
-        element.innerHTML += text.charAt(i);
-
-        i++;
-
-        if (i >= text.length) {
-
-            clearInterval(typing);
-        }
-
-    }, 35);
+    z-index: 10;
 }
 
-function openLetter() {
+#heart {
 
-    storyActive = false;
+    width: 150px;
 
-    storyScene.style.display = "none";
+    cursor: pointer;
 
-    finalScene.style.display = "flex";
+    animation: heartbeat 1.3s infinite;
 
-    document.body.style.background =
-        "radial-gradient(circle at center,#ff9fd9 0%,#8a2e69 45%,#1a0016 100%)";
-
-    typeLetter(
-        finalText,
-        typedLetter
-    );
+    filter:
+        drop-shadow(0 0 15px #ff69b4) drop-shadow(0 0 40px #ff69b4);
 }
 
-/* ==========================
-   REPLAY
-========================== */
+@keyframes heartbeat {
 
-replayBtn.addEventListener(
-    "click",
-    () => {
-
-        location.reload();
+    0% {
+        transform: scale(1);
     }
-);
 
-/* ==========================
-   EVENTS
-========================== */
+    25% {
+        transform: scale(1.15);
+    }
 
-document.body.addEventListener(
-    "click",
-    startExperience,
-    { once: true }
-);
+    50% {
+        transform: scale(1);
+    }
 
-continueHint.addEventListener(
-    "click",
-    nextScene
-);
+    75% {
+        transform: scale(1.12);
+    }
 
-storyScene.addEventListener(
-    "click",
-    nextScene
-);
+    100% {
+        transform: scale(1);
+    }
+}
+
+#tapText {
+
+    margin-top: 20px;
+
+    color: white;
+
+    letter-spacing: 4px;
+
+    font-size: 15px;
+
+    opacity: .8;
+}
+
+#birthdayTitle {
+
+    position: absolute;
+
+    text-align: center;
+
+    opacity: 0;
+}
+
+#birthdayTitle h2 {
+
+    color: white;
+
+    font-weight: 300;
+
+    font-size: 38px;
+}
+
+#birthdayTitle h1 {
+
+    font-family: 'Great Vibes', cursive;
+
+    color: #ffd4e8;
+
+    font-size: 90px;
+
+    text-shadow:
+        0 0 10px #ff69b4,
+        0 0 20px #ff69b4,
+        0 0 40px #ff69b4;
+}
+
+/* STORY */
+
+#storyScene {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: none;
+
+    overflow: hidden;
+
+    z-index: 20;
+}
+
+.storyCard {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    opacity: 0;
+
+    overflow: hidden;
+}
+
+.storyCard.active {
+
+    opacity: 1;
+}
+
+/* GIRL 1 & GIRL 3 */
+
+.portrait {
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: -160px;
+
+    transform: translateX(-50%);
+
+    height: 115vh;
+
+    width: auto;
+
+    max-width: 90vw;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(0 0 25px #ff69b4) drop-shadow(0 0 60px rgba(255, 105, 180, .5));
+}
+
+/* GIRL 2 */
+
+.fullbody {
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 0;
+
+    transform: translateX(-50%);
+
+    height: 92vh;
+
+    width: auto;
+
+    max-width: 90vw;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(0 0 25px #ff69b4) drop-shadow(0 0 60px rgba(255, 105, 180, .5));
+}
+
+/* fallback */
+
+.sceneImage {
+
+    display: block;
+}
+
+/* QUOTES */
+
+.quote {
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 110px;
+
+    transform: translateX(-50%);
+
+    width: 90%;
+
+    text-align: center;
+
+    color: white;
+
+    font-size: 22px;
+
+    line-height: 1.7;
+
+    z-index: 50;
+
+    text-shadow:
+        0 0 15px rgba(0, 0, 0, .8);
+}
+
+#continueHint {
+
+    display: none !important;
+}
+
+/* FINAL LETTER */
+
+#finalScene {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: none;
+
+    justify-content: center;
+
+    align-items: center;
+
+    flex-direction: column;
+
+    padding: 30px;
+
+    text-align: center;
+
+    z-index: 30;
+}
+
+#letterBox {
+
+    max-width: 700px;
+}
+
+#letterBox h2 {
+
+    color: #ffd4e8;
+
+    font-family: 'Great Vibes', cursive;
+
+    font-size: 50px;
+
+    margin-bottom: 20px;
+}
+
+#typedLetter {
+
+    color: white;
+
+    line-height: 1.9;
+
+    font-size: 18px;
+}
+
+#replayBtn {
+
+    margin-top: 40px;
+
+    border: none;
+
+    padding: 15px 25px;
+
+    border-radius: 50px;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+    background: #ff69b4;
+
+    color: white;
+
+    box-shadow:
+        0 0 20px rgba(255, 105, 180, .5);
+}
+
+#replayBtn:hover {
+
+    transform: scale(1.05);
+}
+
+/* MOBILE */
+
+@media(max-width:768px) {
+
+    #heart {
+        width: 120px;
+    }
+
+    #birthdayTitle h1 {
+        font-size: 70px;
+    }
+
+    .portrait {
+
+        height: 120vh;
+
+        bottom: -180px;
+
+        max-width: 95vw;
+    }
+
+    .fullbody {
+
+        height: 95vh;
+
+        max-width: 95vw;
+    }
+
+    .quote {
+
+        bottom: 90px;
+
+        width: 92%;
+
+        font-size: 17px;
+
+        line-height: 1.6;
+    }
+
+    #typedLetter {
+
+        font-size: 16px;
+    }
+
+    #letterBox h2 {
+
+        font-size: 40px;
+    }
+}
